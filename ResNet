@@ -1,0 +1,124 @@
+clc
+clear
+close all
+
+%% Laod Data
+
+load('MRIdata.mat');
+
+imageSize = [224 224];
+N_data = numel(label);
+
+for i = 1:N_data;
+    img = Data(:,:,:,i);
+    img2(:,:,1) = imresize(img,imageSize);
+    img2(:,:,2) = imresize(img,imageSize);
+    img2(:,:,3) = imresize(img,imageSize);
+    data1(:,:,:,i)=img2;
+end
+
+clear data
+
+%% Shuffling Data
+N_data = size(data1,4);
+
+ind_tr = round(0.75*N_data);
+
+idx = randperm(N_data);
+
+X = data1(:,:,:,idx);
+T = label(idx);
+
+%% Train ans Test Data Sepratation
+X_Tr = X(:,:,:,1:ind_tr);
+X_Ts = X(:,:,:,1+ind_tr:end);
+
+T_Tr = T(1:ind_tr);
+T_Ts = T(1+ind_tr:end);
+
+clear data1;
+
+%% ResNet 18 
+net = resnet18;
+
+%% ResNet 18 feature extractor
+layer = 'pool5';
+
+for i = 1:N_data
+    features(i,:) = activations(net,X(:,:,:,i),layer,'OutputAs','rows');
+end
+
+%% Train KNN
+KNN_classifier = fitcknn(features(1:ind_tr,:),T(1:ind_tr),'Standardize',true,...
+                    'NumNeighbors',10,'Distance','euclidean');
+
+Y_Tr_KNN = predict(KNN_classifier,features(1:ind_tr,:));
+Y_Ts_KNN = predict(KNN_classifier,features(1+ind_tr:end,:));
+
+acc_tr = sum(Y_Tr_KNN == T_Tr')./numel(T_Tr)*100;
+acc_ts = sum(Y_Ts_KNN == T_Ts')./numel(T_Ts)*100;
+
+KNN = [acc_tr acc_ts]';
+
+%% Train SVM
+template = templateSVM('Standardize',true,'KernelFunction','linear');
+SVM_classifier = fitcecoc(features(1:ind_tr,:),T(1:ind_tr),'Learners',template);
+
+Y_Tr_SVM = predict(SVM_classifier,features(1:ind_tr,:));
+Y_Ts_SVM = predict(SVM_classifier,features(1+ind_tr:end,:));
+
+acc_tr = sum(Y_Tr_SVM == T_Tr')./numel(T_Tr)*100;
+acc_ts = sum(Y_Ts_SVM == T_Ts')./numel(T_Ts)*100;
+
+SVM = [acc_tr acc_ts]';
+
+%% Train Softmax
+
+NumFeatures = size(features,2);
+
+layers = [
+    featureInputLayer(NumFeatures)
+    
+    fullyConnectedLayer(50)
+    dropoutLayer(0.05)
+    
+    fullyConnectedLayer(3)
+    softmaxLayer
+    classificationLayer];
+
+options = trainingOptions('adam', ...
+    'MaxEpochs',20,...
+    'LearnRateSchedule','piecewise', ...
+    'InitialLearnRate',1e-4, ...
+    'LearnRateDropFactor', 0.75, ...
+    'LearnRateDropPeriod', 4, ...
+    'Verbose',false, ...
+    'Plots','training-progress');
+
+Net = trainNetwork(features(1:ind_tr,:),T(1:ind_tr),layers,options);
+
+Y_Tr_SFT = classify(Net,features(1:ind_tr,:));
+Y_Ts_SFT = classify(Net,features(1+ind_tr:end,:));
+Y = classify(Net,features);
+
+acc_tr = sum(Y_Tr_SFT == T_Tr')./numel(T_Tr)*100;
+acc_ts = sum(Y_Ts_SFT == T_Ts')./numel(T_Ts)*100;
+
+Softmax = [acc_tr acc_ts]';
+
+Result = table(KNN, SVM, Softmax,'RowNames',{'Train','Test'})
+save('./Result/ResNet18/Result.mat','Result')
+
+Result = [KNN, SVM, Softmax]';
+x = categorical({'KNN','SVM','Softmax'});
+x = reordercats(x,{'KNN','SVM','Softmax'});
+bar(x,Result)
+ylim([0 110])
+grid minor
+savefig('./Result/ResNet18/BarPlot.fig')
+
+plotconfusion(T_Tr',Y_Tr_KNN,'KNN Train',T_Tr',Y_Tr_SVM,'SVM Train',T_Tr',Y_Tr_SFT,'SoftMax Train',...
+              T_Ts',Y_Ts_KNN,'KNN Test',T_Ts',Y_Ts_SVM,'SVM Test',T_Ts',Y_Ts_SFT,'SoftMax Test')
+savefig('./Result/ResNet18/ConfusionMatrix.fig')
+
+
