@@ -1,0 +1,29 @@
+clc
+clear
+close all
+
+for s = 1:3064
+    
+    %% Load data
+  clc
+  disp(['data' num2str(s) ' ,(' num2str(s/3064*100) '%)'] )
+  load(['./data/mat/' num2str(s) '.mat']);
+  
+    img = cjdata.image;
+    img1 = imadjust(img);
+    img = imresize(img1,[224,224]);
+    img = im2double(img);
+    
+    %% Data Normalization
+    featureSet = img./(max(img(:)));
+    featureSet = uint8(255*featureSet);
+    
+    Data(:,:,:,s) = featureSet;
+    
+    label(s) = cjdata.label;
+    
+end
+
+label = categorical(label);
+
+save('MRIdata.mat','Data','label')
