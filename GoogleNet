@@ -118,7 +118,25 @@ grid minor
 savefig('./Result/GoogleNet/BarPlot.fig')
 
 plotconfusion(T_Tr',Y_Tr_KNN,'KNN Train',T_Tr',Y_Tr_SVM,'SVM Train',T_Tr',Y_Tr_SFT,'SoftMax Train',...
-              T_Ts',Y_Ts_KNN,'KNN Test',T_Ts',Y_Ts_SVM,'SVM Test',T_Ts',Y_Ts_SFT,'SoftMax Test')
+              T_Ts',Y_Ts_KNN,'KNN Test',T_Ts',Y_Ts_SVM,'SVM Test',T_Ts',Y_Ts_SFT,'SoftMax Test')GoogleNet, also known as Inception, is a deep convolutional neural network architecture designed for image classification and object detection tasks. While it is not specifically tailored for medical imaging, it can be adapted for use in the diagnosis of brain tumors through a process known as transfer learning.
+
+Transfer learning involves taking a pre-trained neural network, like GoogleNet, which has learned features from a large dataset for general image classification, and fine-tuning it on a smaller dataset related to a specific task—in this case, brain tumor detection. The advantages of transfer learning include the ability to leverage the knowledge gained from vast datasets and accelerate training on a smaller, task-specific dataset.
+
+In the context of brain tumor diagnosis, GoogleNet can be used as a feature extractor to capture meaningful patterns and features from medical images, such as MRI scans. The network learns to recognize important characteristics that distinguish between healthy brain tissue and areas affected by tumors.
+
+The function of GoogleNet in this context involves:
+
+Feature Extraction: GoogleNet excels at capturing hierarchical and abstract features from images through its inception modules. These features may include shapes, textures, and patterns that are indicative of abnormalities like tumors.
+
+Pattern Recognition: The trained GoogleNet can identify complex patterns in medical images, aiding in the detection of abnormal regions within the brain.
+
+Classification: Through transfer learning, the network can be fine-tuned to classify image patches or segments as either tumor or non-tumor regions. This classification can provide valuable information to radiologists and healthcare professionals.
+
+Localization: GoogleNet can also assist in localizing the precise location of tumors within the brain, which is crucial for treatment planning.
+
+It's important to note that while GoogleNet can contribute to the diagnosis of brain tumors, medical imaging tasks often require specialized architectures designed for segmentation. Segmentation networks, such as U-Net or variations of it, are better suited for outlining and precisely delineating the boundaries of tumors in medical images.
+
+In summary, GoogleNet can play a role in the diagnosis of brain tumors by leveraging its capabilities in feature extraction, pattern recognition, and classification when adapted through transfer learning on relevant medical imaging datasets.
 savefig('./Result/GoogleNet/ConfusionMatrix.fig')
 
 
