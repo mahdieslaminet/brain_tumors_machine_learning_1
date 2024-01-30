@@ -16,3 +16,4 @@ To run the files more easily and better, please run them in the following order
 3**GooleNet
 4**VGG16
 5**ResNet
+If you have any questions or problems with the implementation of the code, you can send an email to the following address.{sanagolmarzialasl@gmail.com}
