@@ -1,7 +1,8 @@
 # brain_tumors_machine_learning_1
 In today's life and society, the correct diagnosis of brain tumors can save the lives of many people. In this article, we have contributed to improving the diagnosis of these tumors by using four artificial neural networks. You can use the following site to obtain the data: https://figshare.com/articles/dataset/brain_tumor_dataset/1512427. In this study, we have used the MATLAB programming language.
 
-1)First, we assign the existing MAT numbers to the image so that we can use the MRA images.
+1)First, we assign the existing MRI
+numbers to the image so that we can use the MRI images.
 
 2)Next, we enhance the contrast of the images and normalize them.
 
