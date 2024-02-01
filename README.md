@@ -18,6 +18,11 @@ To run the files more easily and effectively, please execute them in the followi
 3**GooleNet
 4**VGG16
 5**ResNet
+
+
+proposal and article use in this project
+https://drive.google.com/drive/folders/1gQ7UMsqw2JYSv4bk4OaC7S2ZWl2cBkNi
+
 If you have any questions or encounter issues with the implementation of the code, feel free to send an email to the following address: sanagolmarzialasl@gmail.com.
 
 
